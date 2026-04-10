@@ -1,142 +1,97 @@
-# Task Manager
+# Checkd
 
-A simple full-stack task manager built with React and Express. You can add tasks, mark them as done, and delete them. Nothing fancy — just a clean, working CRUD app.
+A no-frills task manager. Add things you need to do, check them off, delete them when you're done. That's literally it.
 
----
-
-## Why I built this
-
-This was a focused 2-hour exercise to practice building a proper full-stack app from scratch — writing a real REST API, connecting it to a React frontend, and handling edge cases correctly without cutting corners.
+Built this as a 2-hour full-stack exercise — wanted to keep it tight and actually finish it rather than spiral into feature creep.
 
 ---
 
-## Tech Stack
+## Stack
 
-**Frontend**
-- React (with hooks)
-- Vite
-- Plain Fetch API — no axios, no extra dependencies
-
-**Backend**
-- Node.js + Express
-- In-memory storage (intentionally — no database setup needed)
+- **Frontend** — React + Vite, plain Fetch API
+- **Backend** — Node.js + Express
+- **Storage** — In-memory (resets on restart, intentional)
 
 ---
 
-## Project Structure
+## Running locally
 
-```
-├── backend/
-│   ├── app.js                  # Express app entry point
-│   ├── routes/
-│   │   └── taskRoutes.js       # Route definitions
-│   ├── controllers/
-│   │   └── taskController.js   # Business logic
-│   └── data/
-│       └── store.js            # In-memory task store
-│
-├── frontend/
-│   └── src/
-│       ├── App.jsx
-│       ├── components/
-│       │   ├── AddTaskForm.jsx
-│       │   ├── TaskItem.jsx
-│       │   └── TaskList.jsx
-│       └── services/
-│           └── taskService.js  # All API calls in one place
-│
-└── prd.txt                     # Original requirements
-```
+You'll need two terminals open.
 
----
-
-## Getting Started
-
-You'll need two terminals — one for the backend, one for the frontend.
-
-### Backend
-
+**Backend first:**
 ```bash
 cd backend
 npm install
 npm start
 ```
+Starts on port 3001.
 
-Runs on `http://localhost:3001`
-
-### Frontend
-
+**Then the frontend:**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+Opens at `http://localhost:5173`.
 
-Runs on `http://localhost:5173`
+That's it. No env files, no config, no Docker.
+
+---
+
+## Folder layout
+
+```
+backend/
+  app.js
+  routes/taskRoutes.js
+  controllers/taskController.js
+  data/store.js
+
+frontend/
+  src/
+    App.jsx
+    components/
+      AddTaskForm.jsx
+      TaskItem.jsx
+      TaskList.jsx
+    services/
+      taskService.js
+```
+
+Kept the API calls in one file (`taskService.js`) so components don't have raw fetch calls scattered everywhere. Controllers handle the logic, routes just wire things up. Pretty standard separation.
 
 ---
 
 ## API
 
-| Method | Endpoint | What it does |
-|--------|----------|--------------|
-| GET | `/api/tasks` | Fetch all tasks |
-| POST | `/api/tasks` | Create a new task |
-| PATCH | `/api/tasks/:id` | Toggle completion |
-| DELETE | `/api/tasks/:id` | Delete a task |
-
-### Task shape
-
-```json
-{
-  "id": "uuid",
-  "title": "Buy groceries",
-  "completed": false,
-  "createdAt": "2026-04-10T10:00:00Z"
-}
+```
+GET    /api/tasks        → get all tasks
+POST   /api/tasks        → create a task  { title: "..." }
+PATCH  /api/tasks/:id    → toggle done    { completed: true/false }
+DELETE /api/tasks/:id    → remove it
 ```
 
-### Validation rules (POST)
-
-- Title is required
-- Title can't be blank (whitespace doesn't count)
-- Max 100 characters
+Errors always come back as `{ "error": "message" }` with the right status code (400, 404, 500).
 
 ---
 
-## Error Format
+## A few things I was deliberate about
 
-All errors come back in the same shape:
-
-```json
-{ "error": "Error message here" }
-```
-
-Status codes used: `400`, `404`, `500`
+- The UI doesn't update until the server actually responds. No optimistic updates. Safer, more honest.
+- Buttons lock during requests so you can't spam-click and get weird state.
+- Whitespace-only titles get rejected on both ends — frontend skips the request, backend double-checks anyway.
+- Each task handles its own error display. If toggling one task fails, it shows under that task, not globally.
 
 ---
 
-## What's handled
+## What's not here (on purpose)
 
-- Empty or whitespace-only titles are rejected on both frontend and backend
-- Buttons disable during API calls so you can't double-submit
-- Each task shows its own error if something goes wrong
-- If the initial load fails, there's a retry button
-- Deleting or toggling only updates the UI after the server responds
+No database, no login, no filters. The goal was to build something correct and clean within 2 hours, not to build Notion.
+
+Data lives in memory and disappears on restart. That's a known trade-off, not a bug.
 
 ---
 
-## What's intentionally missing
+## If you want to run your own version
 
-- No database — data resets when you restart the server (by design)
-- No authentication
-- No filtering or sorting
-- No edit functionality
-
-These were deliberately left out to stay focused on core CRUD and API design within the time constraint.
-
----
-
-## Notes
-
-Built as part of a full-stack development assignment. The goal was clean structure and correct behavior — not feature count.
+Fork it, `npm install` in both folders, and you're good. No API keys, no accounts, no setup drama.
