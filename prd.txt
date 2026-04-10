@@ -1,0 +1,248 @@
+PRD — Task Manager Application
+
+1. Overview
+This project is a minimal full-stack Task Manager built to demonstrate core CRUD functionality, API design, and frontend-backend integration within a constrained timeframe (~1–2 hours).
+
+The focus is on predictable behavior, clean structure, and handling edge cases correctly rather than UI complexity.
+
+--------------------------------------------------
+
+2. Objectives
+- Implement complete CRUD operations for tasks
+- Maintain clear frontend-backend separation
+- Ensure consistent API responses
+- Handle invalid input and failure cases properly
+
+--------------------------------------------------
+
+3. Scope
+
+In Scope:
+- Create, view, update, and delete tasks
+- Basic validation and error handling
+- Loading and error states in UI
+
+Out of Scope:
+- Authentication or multi-user support
+- Persistent database
+- Complex UI or animations
+
+--------------------------------------------------
+
+4. Tech Stack
+
+Frontend:
+- React (functional components with hooks)
+- Fetch API for HTTP requests
+
+Backend:
+- Node.js with Express
+
+Storage:
+- In-memory array (resets on server restart)
+
+Reason:
+Chosen to minimize setup time and focus on core logic and API design.
+
+--------------------------------------------------
+
+5. Data Model
+
+Task {
+  id: string
+  title: string
+  completed: boolean
+  createdAt: string (ISO timestamp)
+}
+
+--------------------------------------------------
+
+6. API Design
+
+Base URL:
+/api
+
+GET /tasks
+- Returns all tasks
+
+Response:
+[
+  {
+    "id": "1",
+    "title": "Sample Task",
+    "completed": false,
+    "createdAt": "2026-04-10T10:00:00Z"
+  }
+]
+
+----------------------
+
+POST /tasks
+- Creates a new task
+
+Request:
+{
+  "title": "New Task"
+}
+
+Validation:
+- Title must exist
+- Title must not be empty after trimming
+- Max length: 100 characters
+
+Response:
+{
+  "id": "2",
+  "title": "New Task",
+  "completed": false,
+  "createdAt": "2026-04-10T10:05:00Z"
+}
+
+----------------------
+
+PATCH /tasks/:id
+- Updates task completion status
+
+Request:
+{
+  "completed": true
+}
+
+Rules:
+- Only 'completed' field is allowed
+- Extra fields are ignored
+
+Responses:
+- 200: Success
+- 404: Task not found
+- 400: Invalid input
+
+----------------------
+
+DELETE /tasks/:id
+- Deletes a task
+
+Responses:
+- 200: Success
+- 404: Task not found
+
+--------------------------------------------------
+
+7. Error Format
+
+{
+  "error": "Error message"
+}
+
+Status Codes:
+- 400: Invalid input
+- 404: Not found
+- 500: Server error
+
+--------------------------------------------------
+
+8. Frontend Behavior
+
+Task List:
+- Fetch tasks on initial load
+- Render each task as a separate component
+
+Add Task:
+- Controlled input field
+- Submit disabled if input is empty
+- Clears input after success
+
+Toggle Completion:
+- Checkbox triggers PATCH request
+- UI updates after server response (no optimistic updates)
+
+Delete Task:
+- Removed after successful API response
+
+State:
+- useState for local state
+- Separate states for tasks, loading, and error
+
+--------------------------------------------------
+
+9. Edge Cases
+
+- Empty or whitespace-only title → rejected
+- Title longer than 100 characters → rejected
+- Updating non-existent task → 404
+- Deleting non-existent task → 404
+- Multiple rapid clicks → buttons disabled during request
+- API failure → error shown, no UI change
+
+--------------------------------------------------
+
+10. Storage Strategy
+
+In-memory storage is used to:
+- Avoid database setup
+- Keep implementation fast
+- Stay within time constraints
+
+Persistence is intentionally skipped.
+
+--------------------------------------------------
+
+11. Constraints
+
+- Time limit: ~2 hours
+- Single-user only
+- No authentication
+- No database
+- Minimal UI styling
+
+--------------------------------------------------
+
+12. Trade-offs
+
+- No persistence → data lost on refresh
+- No optimistic updates → safer but slightly slower UX
+- No global state library → unnecessary for this scale
+- Limited validation → only essential checks included
+
+--------------------------------------------------
+
+13. Folder Structure
+
+backend/
+  routes/
+  controllers/
+  data/
+  app.js
+
+frontend/
+  components/
+  services/
+  App.jsx
+
+--------------------------------------------------
+
+14. Implementation Notes
+
+- API calls handled via a frontend service layer
+- Each task is a separate component
+- Loading and error states handled per action
+- Backend separated into routes and controllers
+
+--------------------------------------------------
+
+15. Success Criteria
+
+- All CRUD operations work correctly
+- API responses are consistent
+- UI reflects backend state accurately
+- Errors are handled properly
+- Code is clean and readable
+
+--------------------------------------------------
+
+16. Possible Extensions
+
+- Filter tasks (completed/incomplete)
+- Edit task title
+- Add persistence (file or database)
+- Basic testing
